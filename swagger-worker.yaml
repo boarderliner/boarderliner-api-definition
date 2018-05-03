@@ -1,0 +1,122 @@
+swagger: "2.0"
+info:
+  description: "Boarderliner client api"
+  version: "1.0.0"
+  title: "Boarderliner client api"
+host: "boarderliner.shnbk.de"
+basePath: "/worker/v1"
+schemes:
+- "https"
+paths:
+  /job:
+    get:
+      summary: "get (and lock) next job"
+      operationId: "getLockJob"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "ok, here is your jobId"
+          schema:
+            $ref: "#/definitions/ImageTaskId"
+        404:
+          description: "job not found"
+        default:
+          description: "unknown error"
+  /job/{jobId}:
+    put:
+      summary: "upload processed job"
+      operationId: "uploadJob"
+      consumes:
+        - "multipart/form-data"
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          type: string
+        - name: image
+          in: formData
+          type: file
+          required: true
+      responses:
+        204:
+          description: "ok"
+        404:
+          description: "job not found"
+        406:
+          description: "this is bullshit!"
+        default:
+          description: "unknown error"
+        
+    get:
+      summary: "getJob"
+      operationId: "getJob"
+      produces:
+        - "application/json"
+      parameters:
+        - name: jobId
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "ok, here is your job"
+          schema:
+            $ref: "#/definitions/Task"
+        404:
+          description: "job not found"
+        default:
+          description: "unknown error"
+  /image/{imageId}:
+    get:
+      summary: "Get unprocessed image"
+      operationId: "getImage"
+      produces:
+        - "image/jpeg"
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: "The requested Image"
+        404:
+          description: "Unproccessed image not found"
+        default:
+          description: "unknown error"
+
+definitions:
+  ImageTaskResponse:
+    type: object
+    required: 
+      - imageId
+    properties:
+      imageId:
+        type: "string"
+        
+  ImageTaskId:
+    type: object
+    required: 
+      - taskId
+    properties:
+      taskId:
+        type: "string"
+  Task:
+    type: object
+    required: 
+      - jobId
+      - type
+      - imgurl
+    properties:
+      jobId:
+        type: string
+      type:
+        type: string
+        enum:
+          - imfeelinglucky
+      imgurl:
+        type: string
+      
+        
+

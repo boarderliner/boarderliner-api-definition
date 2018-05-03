@@ -1,0 +1,105 @@
+swagger: "2.0"
+info:
+  description: "Boarderliner client api"
+  version: "1.0.0"
+  title: "Boarderliner client api"
+host: "boarderliner.shnbk.de"
+basePath: "/client/v1"
+schemes:
+- "https"
+paths:
+  /image:
+    post:
+      summary: "Upload an image"
+      operationId: "uploadImage"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "image"
+        in: "formData"
+        description: "image to upload"
+        required: true
+        type: "file"
+      responses:
+        201:
+          description: "ok"
+          schema:
+            $ref: "#/definitions/ImageTaskResponse"
+        406:
+          description: "no image"
+        default:
+          description: "unknown error"
+  /image/{imageId}/status:
+    get:
+      summary: "Check image status"
+      operationId: "getImageStatus"
+      produces:
+        - "application/json"
+      parameters:
+        - name: imageId
+          in: "path"
+          required: true
+          type: string
+      responses:
+        200:
+          description: "Ready"
+        404:
+          description: "Unknown ImageId"
+        412:
+          description: "Image not ready yet"
+        default:
+          description: "unknown error"
+  /image/{imageId}:
+    get:
+      summary: "Get processed image"
+      operationId: "getImage"
+      produces:
+        - "image/jpeg"
+      parameters:
+        - name: imageId
+          in: path
+          required: true
+          type: string
+      responses:
+        200:
+          description: "The requested Image"
+        404:
+          description: "Proccessed image not found"
+        default:
+          description: "unknown error"
+  /markerpdf:
+    get:
+      summary: "get pdf with instruction and marker"
+      operationId: "getMarkerPdf"
+      produces:
+        - "application/pdf"
+      parameters:
+        - name: height
+          in: query
+          required: true
+          type: number
+          description: "height in cm"
+        - name: width
+          in: query
+          required: true
+          type: number
+          description: "width in cm"
+      responses:
+        200:
+          description: "The requested pdf"
+        400: 
+          description: "we don't support whiteboards for ants or giants"
+        default:
+          description: "unknown error"
+definitions:
+  ImageTaskResponse:
+    type: object
+    required: 
+      - imageId
+    properties:
+      imageId:
+        type: "string"
+        
+
